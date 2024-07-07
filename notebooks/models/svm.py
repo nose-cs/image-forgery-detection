@@ -36,7 +36,7 @@ class SVMImageForgeryDetector(BaseEstimator, ClassifierMixin):
     grayscale during preprocessing.
     """
 
-    def __init__(self, img_size=(256, 384), use_fourier=True, use_noise=True,
+    def __init__(self, img_size=(128, 128), use_fourier=True, use_noise=True,
                  use_edges=True, use_texture=True, use_segmentation=True):
         """
         Initialize the SVM Image Forgery Detector.
@@ -110,30 +110,33 @@ class SVMImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param image: Input grayscale image
         :return: 1D array of concatenated features
         """
-        features = []
-
         if self.use_fourier:
-            ft = self.compute_fourier_transform(image).ravel()
-            features.append(ft)
+            ft = self.compute_fourier_transform(image).ravel()  # Flattens the result of the Fourier transform 70
+        else:
+            ft = []
 
         if self.use_noise:
-            mean_noise, std_noise = self.extract_noise_features(image)
-            features.extend([mean_noise, std_noise])
+            nf = self.extract_noise_features(image)  # Returns two scalars 72
+        else:
+            nf = [], []
 
         if self.use_edges:
-            ed = self.detect_edges(image).ravel()
-            features.append(ed)
+            ed = self.detect_edges(image).ravel()  # Flattens the detected edges 77
+        else:
+            ed = []
 
         if self.use_texture:
-            tf = self.compute_texture_features(image)
-            features.append(tf)
+            tf = np.array([self.compute_texture_features(image)])  # Wraps the scalar in an array 72
+        else:
+            tf = []
 
         if self.use_segmentation:
-            seg = self.segment_image(image).ravel()
-            features.append(seg)
+            seg = self.segment_image(image).ravel()  # Flattens the segmented image 58
+        else:
+            seg = []
 
         # Concatenates all features into a single 1D array
-        return np.concatenate(features) if features else np.array([])
+        return np.hstack([ft, nf[0], nf[1], ed, tf, seg])
 
     def preprocess_image(self, image):
         image = tf.image.decode_jpeg(image, channels=3)
