@@ -16,6 +16,10 @@ train_dir = os.path.join(DATA_PATH, 'train')
 # Create output directories
 os.makedirs(test_dir, exist_ok=True)
 os.makedirs(train_dir, exist_ok=True)
+os.makedirs(os.path.join(test_dir, 'authentic'), exist_ok=True)
+os.makedirs(os.path.join(test_dir, 'tampered'), exist_ok=True)
+os.makedirs(os.path.join(train_dir, 'authentic'), exist_ok=True)
+os.makedirs(os.path.join(train_dir, 'tampered'), exist_ok=True)
 
 
 def get_file_list_and_labels(directory, label):
@@ -50,15 +54,24 @@ print(f"Test set: {len(test_files)} images ({TEST_SPLIT * 100:.2f}%)")
 
 # Copy files to the appropriate directories
 for src_file, label, dst_dir in zip(
-    train_files, train_labels, [train_dir] * len(train_files)
+    train_files, train_labels,
+    [os.path.join(train_dir, 'authentic')] * sum('Au' in src_file for src_file in train_files) +
+    [os.path.join(train_dir, 'tampered')] * sum('Tp' in src_file for src_file in train_files)
 ):
-    dst_file = os.path.join(dst_dir, f"{os.path.basename(src_file)}")
+    if 'Au' in src_file:
+        dst_file = os.path.join(os.path.join(train_dir, 'authentic'), f"{os.path.basename(src_file)}")
+    elif 'Tp' in src_file:
+        dst_file = os.path.join(os.path.join(train_dir, 'tampered'), f"{os.path.basename(src_file)}")
     os.makedirs(os.path.dirname(dst_file), exist_ok=True)
     shutil.copy(src_file, dst_file)
 
 for src_file, label, dst_dir in zip(
-    test_files, test_labels, [test_dir] * len(test_files)
+    test_files, test_labels, [os.path.join(test_dir, 'authentic')] * sum('Au' in src_file for src_file in test_files) +
+                             [os.path.join(test_dir, 'tampered')] * sum('Tp' in src_file for src_file in test_files)
 ):
-    dst_file = os.path.join(dst_dir, f"{os.path.basename(src_file)}")
+    if 'Au' in src_file:
+        dst_file = os.path.join(os.path.join(test_dir, 'authentic'), f"{os.path.basename(src_file)}")
+    elif 'Tp' in src_file:
+        dst_file = os.path.join(os.path.join(test_dir, 'tampered'), f"{os.path.basename(src_file)}")
     os.makedirs(os.path.dirname(dst_file), exist_ok=True)
     shutil.copy(src_file, dst_file)
