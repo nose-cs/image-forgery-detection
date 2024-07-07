@@ -10,12 +10,10 @@ authentic_dir = os.path.join(PATH, 'Au')
 tampered_dir = os.path.join(PATH, 'Tp2')
 
 # Output directories
-validation_dir = os.path.join(DATA_PATH, 'validation')
 test_dir = os.path.join(DATA_PATH, 'test')
 train_dir = os.path.join(DATA_PATH, 'train')
 
 # Create output directories
-os.makedirs(validation_dir, exist_ok=True)
 os.makedirs(test_dir, exist_ok=True)
 os.makedirs(train_dir, exist_ok=True)
 
@@ -40,33 +38,19 @@ all_files = authentic_files + tampered_files
 all_labels = authentic_labels + tampered_labels
 
 # Split the data into training, validation, and test sets
-TRAIN_SPLIT = 0.7
-VAL_SPLIT = 0.15
-TEST_SPLIT = 0.15
+TRAIN_SPLIT = 0.8
+TEST_SPLIT = 0.2
 
-train_files, val_test_files, train_labels, val_test_labels = train_test_split(
-    all_files, all_labels, test_size=VAL_SPLIT + TEST_SPLIT, random_state=42, stratify=all_labels
-)
-
-val_files, test_files, val_labels, test_labels = train_test_split(
-    val_test_files, val_test_labels, test_size=TEST_SPLIT / (VAL_SPLIT + TEST_SPLIT), random_state=42,
-    stratify=val_test_labels
+train_files, test_files, train_labels, test_labels = train_test_split(
+    all_files, all_labels, test_size=TEST_SPLIT, random_state=42, stratify=all_labels
 )
 
 print(f"Train set: {len(train_files)} images ({TRAIN_SPLIT * 100:.2f}%)")
-print(f"Validation set: {len(val_files)} images ({VAL_SPLIT * 100:.2f}%)")
 print(f"Test set: {len(test_files)} images ({TEST_SPLIT * 100:.2f}%)")
 
 # Copy files to the appropriate directories
 for src_file, label, dst_dir in zip(
     train_files, train_labels, [train_dir] * len(train_files)
-):
-    dst_file = os.path.join(dst_dir, f"{os.path.basename(src_file)}")
-    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
-    shutil.copy(src_file, dst_file)
-
-for src_file, label, dst_dir in zip(
-    val_files, val_labels, [validation_dir] * len(val_files)
 ):
     dst_file = os.path.join(dst_dir, f"{os.path.basename(src_file)}")
     os.makedirs(os.path.dirname(dst_file), exist_ok=True)
