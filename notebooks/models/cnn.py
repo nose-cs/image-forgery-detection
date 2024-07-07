@@ -6,11 +6,55 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 import numpy as np
 
 
-class CNNImageForgeryPredictorModel(BaseEstimator, ClassifierMixin):
-    def __init__(self, compression_quality: int = 90):
+class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
+    """
+    A Convolutional Neural Network (CNN) based model for detecting image forgery using recompression analysis.
+
+    This class implements an advanced image forgery detection system that leverages the principles of
+    JPEG compression artifacts. It employs a unique approach of comparing an original image with its
+    recompressed version to identify potential manipulations.
+
+    Key features:
+    1. Recompression-based analysis: Utilizes JPEG compression artifacts for forgery detection.
+    2. CNN architecture: Employs a custom CNN for learning and detecting forgery patterns.
+    3. Preprocessing pipeline: Includes image decoding, recompression, and difference computation.
+    4. Compatibility: Inherits from sklearn's BaseEstimator and ClassifierMixin for easy integration.
+
+    Detection process:
+    1. Decodes the input JPEG image.
+    2. Recompresses the image using a specified quality factor.
+    3. Computes the difference between the original and recompressed images.
+    4. Feeds this difference into a CNN for classification.
+
+    The CNN architecture is designed to learn subtle patterns in the compression artifact
+    differences that indicate potential forgery. This method is particularly effective for
+    detecting manipulated areas in JPEG images, as these areas often respond differently
+    to recompression compared to authentic regions.
+
+    Usage:
+    - Initialize the detector with desired parameters (compression quality, image size, etc.)
+    - Use the fit() method to train the model on a set of images
+    - Use the predict() method to detect forgery in new images
+
+    Note: This detector is optimized for JPEG images and may require adaptation for other formats.
+    """
+
+    def __init__(self, compression_quality: int = 90, img_size=(128, 128), epochs=10):
+        """
+        Initialize the CNN model for image forgery detection.
+
+        :param compression_quality: JPEG compression quality to use in preprocessing, default is 90
+        :type compression_quality: int
+        :param img_size: The target size for input images (height, width)
+        :type img_size: tuple
+        """
         self.compression_quality = compression_quality
+        self.img_size = img_size
+        self.img_shape = self.img_size + (1,)
+        self.epochs = epochs
+        # Define and compile the CNN model
         model = Sequential([
-            Input(shape=(128, 128, 1)),
+            Input(shape=self.img_shape),
             Conv2D(32, (3, 3), activation='relu'),
             Conv2D(32, (3, 3), activation='relu'),
             Conv2D(32, (3, 3), activation='relu'),
@@ -22,27 +66,63 @@ class CNNImageForgeryPredictorModel(BaseEstimator, ClassifierMixin):
         model.compile(optimizer=Adam(), loss='binary_crossentropy', metrics=['accuracy'])
         self.model = model
 
-    def recomprimir_imagen_tf(self, imagen):
-        imagen_jpeg = tf.image.encode_jpeg(imagen, quality=self.compression_quality)
-        imagen_recomprimida = tf.image.decode_jpeg(imagen_jpeg)
-        return imagen_recomprimida
+    def recompress_image_tf(self, image):
+        """
+        Recompress the input image using JPEG compression.
+
+        :param image: Input image tensor
+        :return: Recompressed image tensor
+        """
+        jpeg_image = tf.image.encode_jpeg(image, quality=self.compression_quality)
+        recompressed_image = tf.image.decode_jpeg(jpeg_image)
+        return recompressed_image
 
     def preprocess_image(self, image):
-        imagen_original = tf.image.decode_jpeg(image, channels=3)
-        image_compressed = self.recomprimir_imagen_tf(imagen_original)
-        diff = tf.abs(tf.cast(imagen_original, tf.int32) - tf.cast(image_compressed, tf.int32))
-        diferencia_gris = tf.image.rgb_to_grayscale(tf.cast(diff, tf.uint8))
-        resized = tf.image.resize(diferencia_gris, (128, 128))
-        return resized
+        """
+        Preprocess a single image for forgery detection.
+
+        :param image: Raw image data
+        :return: Preprocessed image tensor
+        """
+        # Decode the JPEG image
+        original_image = tf.image.decode_jpeg(image, channels=3)
+        # Recompress the image
+        compressed_image = self.recompress_image_tf(original_image)
+        # Compute the absolute difference between original and recompressed images
+        diff = tf.abs(tf.cast(original_image, tf.int32) - tf.cast(compressed_image, tf.int32))
+        # Convert the difference to grayscale
+        grayscale_diff = tf.image.rgb_to_grayscale(tf.cast(diff, tf.uint8))
+        # Resize the image to match the input size of the CNN
+        resized_diff = tf.image.resize(grayscale_diff, self.img_size)
+        return resized_diff
 
     def prepare_dataset(self, X):
+        """
+        Prepare a batch of images for model input.
+
+        :param X: List of raw image data
+        :return: Numpy array of preprocessed images
+        """
         X_processed = [self.preprocess_image(image) for image in X]
         return np.array(X_processed)
 
     def fit(self, X, y, sample_weight):
+        """
+        Fit the model to the training data.
+
+        :param X: Training images
+        :param y: Target labels
+        :param sample_weight: Sample weights for training
+        """
         X_processed = self.prepare_dataset(X)
-        self.model.fit(X_processed, y, sample_weight=sample_weight)
+        self.model.fit(X_processed, y, sample_weight=sample_weight, epochs=self.epochs)
 
     def predict(self, X):
+        """
+        Predict forgery probability for a set of images.
+
+        :param X: Images to predict on
+        :return: Array of forgery probabilities
+        """
         X_processed = self.prepare_dataset(X)
         return self.model.predict(X_processed)
