@@ -13,7 +13,7 @@ def get_file_list(directory):
     return file_list
 
 
-def load_images_from_directory(directory_path, n: int, target_size=(128, 128), seed=None, authentic_size=3/5):
+def load_images_from_directory(directory_path, n: int, authentic_size, target_size=(128, 128), seed=None):
     if seed is not None:
         random.seed(seed)
 
@@ -50,11 +50,13 @@ def load_images_from_directory(directory_path, n: int, target_size=(128, 128), s
     return np.array(images), np.array(labels)
 
 
-def prepare_image_forgery_dataset(total_number, data_directory, test_size=0.2, random_state=42):
+def prepare_image_forgery_dataset(total_number, data_directory, test_size=0.2, random_state=42, authentic_size=3/5):
     X_train, y_train = load_images_from_directory(os.path.join(data_directory, 'train'),
-                                                  int((total_number - total_number*test_size) // 1), seed=random_state)
+                                                  int((total_number - total_number*test_size) // 1), seed=random_state,
+                                                  authentic_size=authentic_size)
     X_test, y_test = load_images_from_directory(os.path.join(data_directory, 'test'),
-                                                int((total_number*test_size) // 1), seed=random_state)
+                                                int((total_number*test_size) // 1), seed=random_state,
+                                                authentic_size=authentic_size)
     y_train = y_train.ravel()
     y_test = y_test.ravel()
     return X_train, X_test, y_train, y_test
