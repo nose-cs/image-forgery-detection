@@ -39,7 +39,7 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
     Note: This detector is optimized for JPEG images and may require adaptation for other formats.
     """
 
-    def __init__(self, compression_quality: int = 90, img_size=(128, 128), epochs=10):
+    def __init__(self, compression_quality: int = 90, img_size=(128, 128), epochs=10, learning_rate=0.1):
         """
         Initialize the CNN model for image forgery detection.
 
@@ -48,6 +48,7 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param img_size: The target size for input images (height, width)
         :type img_size: tuple
         """
+        self.learning_rate = learning_rate
         self.compression_quality = compression_quality
         self.img_size = img_size
         self.img_shape = self.img_size + (1,)
@@ -63,7 +64,8 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
             Dense(256, activation='relu'),
             Dense(1, activation='sigmoid')
         ])
-        model.compile(optimizer=Adam(), loss='binary_crossentropy', metrics=['accuracy'])
+        model.compile(optimizer=Adam(learning_rate=self.learning_rate), loss='binary_crossentropy',
+                      metrics=['accuracy'])
         self.model = model
 
     def recompress_image_tf(self, image):
@@ -106,7 +108,7 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
         X_processed = [self.preprocess_image(image) for image in X]
         return np.array(X_processed)
 
-    def fit(self, X, y, sample_weight):
+    def fit(self, X, y, sample_weight, X_val, y_val):
         """
         Fit the model to the training data.
 
@@ -115,7 +117,10 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param sample_weight: Sample weights for training
         """
         X_processed = self.prepare_dataset(X)
-        self.model.fit(X_processed, y, sample_weight=sample_weight, epochs=self.epochs)
+        self.model.fit(X_processed, y,
+                       sample_weight=sample_weight,
+                       epochs=self.epochs,
+                       validation_data=(self.prepare_dataset(X_val), y_val))
 
     def predict(self, X):
         """

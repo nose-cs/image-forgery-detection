@@ -2,6 +2,30 @@ import os
 import tensorflow as tf
 import numpy as np
 import random
+from sklearn.metrics import confusion_matrix, accuracy_score
+import matplotlib.pyplot as plt
+from prettytable import PrettyTable
+
+
+def display_images(images, labels, classnames, n=9):
+    """
+    Displays the first n images and their corresponding labels.
+
+    Parameters:
+    images (np.array): Array of image data.
+    labels (np.array): Array of labels corresponding to the images.
+    cassnames (np.array): Array of class names corresponding to the labels.
+    n (int): Number of images to display (default is 9).
+    """
+    n = min(9, n)
+    plt.figure(figsize=(5, 5))
+    for i in range(n):
+        plt.subplot(3, 3, i+1)
+        plt.imshow(tf.image.decode_image(images[i], channels=3))
+        plt.title(f"Label: {classnames[labels[i]]}")
+        plt.axis('off')
+    plt.tight_layout()
+    plt.show()
 
 
 def get_file_list(directory):
@@ -50,13 +74,59 @@ def load_images_from_directory(directory_path, n: int, authentic_size, target_si
     return np.array(images), np.array(labels)
 
 
-def prepare_image_forgery_dataset(total_number, data_directory, test_size=0.2, random_state=42, authentic_size=3/5):
+def prepare_image_forgery_dataset(total_number, data_directory, test_size=0.2, random_state=42,
+                                  authentic_size=3/5, img_size=(128, 128)):
     X_train, y_train = load_images_from_directory(os.path.join(data_directory, 'train'),
                                                   int((total_number - total_number*test_size) // 1), seed=random_state,
-                                                  authentic_size=authentic_size)
+                                                  authentic_size=authentic_size, target_size=img_size)
     X_test, y_test = load_images_from_directory(os.path.join(data_directory, 'test'),
                                                 int((total_number*test_size) // 1), seed=random_state,
-                                                authentic_size=authentic_size)
+                                                authentic_size=authentic_size, target_size=img_size)
     y_train = y_train.ravel()
     y_test = y_test.ravel()
     return X_train, X_test, y_train, y_test
+
+
+def print_model_performance_metrics(y_true, y_pred):
+    """
+    Prints a nicely formatted table with the following metrics:
+    - False Positives (FP)
+    - False Negatives (FN)
+    - True Positives (TP)
+    - True Negatives (TN)
+    - Precision
+    - Recall
+    - F1-score
+    - Overall Accuracy
+
+    Parameters:
+    y_true (array-like): True values of the target variable.
+    y_pred (array-like): Predicted values by the model.
+    """
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    f1 = 2 * (precision * recall) / (precision + recall)
+    accuracy = accuracy_score(y_true, y_pred)
+
+    metrics = {
+        "False Positives (FP)": fp,
+        "False Negatives (FN)": fn,
+        "True Positives (TP)": tp,
+        "True Negatives (TN)": tn,
+        "Precision": precision,
+        "Recall": recall,
+        "F1-score": f1,
+        "Overall Accuracy": accuracy
+    }
+
+    # Create a table with headers and alignment
+    table = PrettyTable(["Metric", "Value"])
+    table.align["Metric"] = "l"
+    table.align["Value"] = "r"
+
+    for key, value in metrics.items():
+        table.add_row([key, str(value)])
+
+    print(table.get_string())
