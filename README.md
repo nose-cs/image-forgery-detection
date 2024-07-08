@@ -13,16 +13,13 @@ Este proyecto aborda el problema de la detección de imágenes editadas, una tar
 Desarrollar y comparar varios enfoques de Machine Learning para detectar modificaciones en imágenes, evaluando cuál de ellos proporciona los resultados más precisos y robustos.
 
 ## Estructura del proyecto 
-├── data
-│   └── CASIA_V2
-│
-├── docs
-│   └── report.pdf
-│
-├── notebooks
-│   └── models
-│
-└── scripts
+├─data <br>
+│&nbsp;   └── CASIA_V2 <br>
+├─docs<br>
+│&nbsp;   └── report.pdf<br>
+├─notebooks<br>
+│&nbsp;   └── models<br>
+└─scripts<br>
 
 - **data/CASIA_V2**: Contiene el dataset CASIA V2 utilizado en el proyecto.
 - **docs**: Incluye documentación, como el informe del proyecto.
