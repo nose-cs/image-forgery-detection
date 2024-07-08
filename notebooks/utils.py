@@ -14,31 +14,34 @@ def get_file_list(directory):
 
 
 def load_images_from_directory(directory_path, n: int, target_size=(128, 128), seed=None):
-    # Set a random seed for reproducibility
     if seed is not None:
         random.seed(seed)
+
     images = []
     labels = []
-    # Get a list of all the image files in the directory
-    image_files = get_file_list(directory_path)
-    # Randomly select n image files
-    selected_files = random.sample(image_files, n)
+
+    authentic_files = [f for f in get_file_list(directory_path) if 'authentic' in f.lower()]
+    tampered_files = [f for f in get_file_list(directory_path) if 'tampered' in f.lower()]
+
+    # Calculate the number of authentic images to select (3/5 of n)
+    n_authentic = min(len(authentic_files), int(3/5 * n))
+
+    # Select authentic images
+    selected_authentic = random.sample(authentic_files, n_authentic)
+
+    # Select tampered images
+    n_tampered = min(len(tampered_files), n - n_authentic)
+    selected_tampered = random.sample(tampered_files, n_tampered)
+
+    selected_files = selected_authentic + selected_tampered
+    random.shuffle(selected_files)  # Shuffle to mix authentic and tampered
+
     for image_path in selected_files:
         if image_path.lower().endswith((".jpg", ".jpeg", ".png")):
-            # Determine the label based on the directory
-            if 'authentic' in image_path:
-                label = 0
-            elif 'tampered' in image_path:
-                label = 1
-            else:
-                raise ValueError(f"Unable to determine label for file: {image_path}")
-            # Read the file
+            label = 0 if 'authentic' in image_path.lower() else 1
             imagen_original = tf.io.read_file(image_path)
-            # Decode the image
             imagen_decoded = tf.image.decode_image(imagen_original, channels=3)
-            # Resize the image
             imagen_resized = tf.image.resize(imagen_decoded, target_size)
-            # Convert back to bytes
             imagen_encoded = tf.io.encode_jpeg(tf.cast(imagen_resized, tf.uint8))
             images.append(imagen_encoded)
             labels.append(label)
