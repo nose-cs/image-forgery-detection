@@ -9,34 +9,34 @@ new_tampered_dir = os.path.join(PATH, 'Tp2')
 
 
 def process_images(input_folder, output_folder):
-    # Asegúrate de que la carpeta de salida exista
+    # Ensure the output folder exists
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
-    # Recorre todos los archivos en la carpeta de entrada
+    # Iterate through all files in the input folder
     for filename in os.listdir(input_folder):
         input_path = os.path.join(input_folder, filename)
-        # Verifica si es un archivo
+        # Check if it's a file
         if os.path.isfile(input_path):
-            # Si es un archivo .tif, conviértelo a .jpeg
+            # If it's a .tif file, convert it to .jpeg
             if filename.lower().endswith('.tif') or filename.lower().endswith('.tiff'):
-                # Cambia la extensión a .jpeg
+                # Change the extension to .jpeg
                 output_filename = os.path.splitext(filename)[0] + '.jpeg'
-                output_path = os.path.join(output_folder, output_filename)       
+                output_path = os.path.join(output_folder, output_filename)
                 try:
                     with Image.open(input_path) as img:
-                        # Convierte y guarda la imagen como .jpeg
+                        # Convert and save the image as .jpeg
                         img.convert("RGB").save(output_path, "JPEG")
-                    print(f"Convertido: {filename} -> {output_filename}")
+                    print(f"Converted: {filename} -> {output_filename}")
                 except Exception as e:
-                    print(f"Error al convertir {filename}: {str(e)}")      
-            # Si no es .tif, simplemente cópialo
+                    print(f"Error converting {filename}: {str(e)}")
+            # If it's not a .tif file, simply copy it
             else:
                 output_path = os.path.join(output_folder, filename)
                 try:
                     shutil.copy2(input_path, output_path)
-                    print(f"Copiado: {filename}")
+                    print(f"Copied: {filename}")
                 except Exception as e:
-                    print(f"Error al copiar {filename}: {str(e)}")
+                    print(f"Error copying {filename}: {str(e)}")
 
 
 def main():

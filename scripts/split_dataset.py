@@ -52,26 +52,29 @@ train_files, test_files, train_labels, test_labels = train_test_split(
 print(f"Train set: {len(train_files)} images ({TRAIN_SPLIT * 100:.2f}%)")
 print(f"Test set: {len(test_files)} images ({TEST_SPLIT * 100:.2f}%)")
 
-# Copy files to the appropriate directories
-for src_file, label, dst_dir in zip(
-    train_files, train_labels,
-    [os.path.join(train_dir, 'authentic')] * sum('Au' in src_file for src_file in train_files) +
-    [os.path.join(train_dir, 'tampered')] * sum('Tp' in src_file for src_file in train_files)
-):
-    if 'Au' in src_file:
-        dst_file = os.path.join(os.path.join(train_dir, 'authentic'), f"{os.path.basename(src_file)}")
-    elif 'Tp' in src_file:
-        dst_file = os.path.join(os.path.join(train_dir, 'tampered'), f"{os.path.basename(src_file)}")
-    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
-    shutil.copy(src_file, dst_file)
 
-for src_file, label, dst_dir in zip(
-    test_files, test_labels, [os.path.join(test_dir, 'authentic')] * sum('Au' in src_file for src_file in test_files) +
-                             [os.path.join(test_dir, 'tampered')] * sum('Tp' in src_file for src_file in test_files)
-):
-    if 'Au' in src_file:
-        dst_file = os.path.join(os.path.join(test_dir, 'authentic'), f"{os.path.basename(src_file)}")
-    elif 'Tp' in src_file:
-        dst_file = os.path.join(os.path.join(test_dir, 'tampered'), f"{os.path.basename(src_file)}")
-    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
-    shutil.copy(src_file, dst_file)
+def copy_files(files, labels, dst_base_dir, set_name):
+    print(f"Copying {set_name} files...")
+    for i, (src_file, label) in enumerate(zip(files, labels), 1):
+        if 'Au' in src_file:
+            dst_dir = os.path.join(dst_base_dir, 'authentic')
+        elif 'Tp' in src_file:
+            dst_dir = os.path.join(dst_base_dir, 'tampered')
+        else:
+            print(f"Unexpected file path: {src_file}")
+            continue
+
+        dst_file = os.path.join(dst_dir, os.path.basename(src_file))
+        shutil.copy(src_file, dst_file)
+
+        if i % 100 == 0:  # Print progress every 100 files
+            print(f"Copied {i}/{len(files)} {set_name} files")
+
+    print(f"Finished copying {len(files)} {set_name} files")
+
+
+# Copy files to the appropriate directories
+copy_files(train_files, train_labels, train_dir, "training")
+copy_files(test_files, test_labels, test_dir, "test")
+
+print("File copying completed.")
