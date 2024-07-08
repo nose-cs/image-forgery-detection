@@ -13,7 +13,7 @@ def get_file_list(directory):
     return file_list
 
 
-def load_images_from_directory(directory_path, n: int, target_size=(128, 128), seed=None):
+def load_images_from_directory(directory_path, n: int, target_size=(128, 128), seed=None, authentic_size=3/5):
     if seed is not None:
         random.seed(seed)
 
@@ -23,8 +23,8 @@ def load_images_from_directory(directory_path, n: int, target_size=(128, 128), s
     authentic_files = [f for f in get_file_list(directory_path) if 'authentic' in f.lower()]
     tampered_files = [f for f in get_file_list(directory_path) if 'tampered' in f.lower()]
 
-    # Calculate the number of authentic images to select (3/5 of n)
-    n_authentic = min(len(authentic_files), int(3/5 * n))
+    # Calculate the number of authentic images to select (authentic_size of n)
+    n_authentic = min(len(authentic_files), int(authentic_size * n))
 
     # Select authentic images
     selected_authentic = random.sample(authentic_files, n_authentic)
