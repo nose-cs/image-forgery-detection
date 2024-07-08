@@ -14,7 +14,7 @@ Desarrollar y comparar varios enfoques de Machine Learning para detectar modific
 
 ## Estructura del proyecto 
 ├─data <br>
-│&nbsp;   └── CASIA_V2 <br>
+│&nbsp;   └── CASIA2 <br>
 ├─docs<br>
 │&nbsp;   └── report.pdf<br>
 ├─notebooks<br>
