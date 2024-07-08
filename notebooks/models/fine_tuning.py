@@ -47,6 +47,8 @@ class TransferLearningImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param learning_rate: The initial learning rate for the optimizer
         :type learning_rate: float
         """
+        self.learning_rate = learning_rate
+        self.dropout_rate = dropout_rate
         self.initial_epochs = initial_epochs
         self.fine_tune_epochs = fine_tune_epochs
 
