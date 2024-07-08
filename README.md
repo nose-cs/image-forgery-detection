@@ -21,7 +21,7 @@ Desarrollar y comparar varios enfoques de Machine Learning para detectar modific
 │&nbsp;   └── models<br>
 └─scripts<br>
 
-- **data/CASIA_V2**: Contiene el dataset CASIA V2 utilizado en el proyecto.
+- **data/CASIA2**: Contiene el dataset CASIA V2 utilizado en el proyecto.
 - **docs**: Incluye documentación, como el informe del proyecto.
 - **notebooks**: Almacena notebooks de Jupyter con análisis exploratorio de datos y experimentos.
 - **notebooks/models**: Contiene notebooks con la implementación y entrenamiento de los modelos.
