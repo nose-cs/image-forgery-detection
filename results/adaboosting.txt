@@ -1,0 +1,63 @@
+base_models = [SVMImageForgeryDetector(use_edges=False, use_noise=False, use_texture=False, img_size=IMG_SIZE) for _ in range(5)]
+boosting_model = AdaBoostingImageForgeryDetector(base_models, learning_rate=0.5)
+Pd: el kernel se rompió
+==================================================
+SVMImageForgeryDetector train
+{'Falsos positivos (FP)': 119, 'Falsos negativos (FN)': 505, 'Verdaderos positivos (TP)': 915, 'Verdaderos negativos (TN)': 2061, 'Precisión': 0.8849129593810445, 'Exhaustividad (Recall)': 0.6443661971830986, 'Puntaje F1': 0.7457212713936431, 'Precisión global (Accuracy)': 0.8266666666666667}
+==================================================
+Sum of weights: 3600.0000
+Mean weight: 1.0000
+Min weight: 1.0000
+Max weight: 1.0000
+==================================================
+Error: 0.17333333333333334
+==================================================
+Peso del modelo: 0.7810925137917774
+==================================================
+Boosting validation
+{'Falsos positivos (FP)': 28, 'Falsos negativos (FN)': 112, 'Verdaderos positivos (TP)': 68, 'Verdaderos negativos (TN)': 192, 'Precisión': 0.7083333333333334, 'Exhaustividad (Recall)': 0.37777777777777777, 'Puntaje F1': 0.49275362318840576, 'Precisión global (Accuracy)': 0.65}
+==================================================
+SVMImageForgeryDetector train
+{'Falsos positivos (FP)': 129, 'Falsos negativos (FN)': 552, 'Verdaderos positivos (TP)': 868, 'Verdaderos negativos (TN)': 2051, 'Precisión': 0.8706118355065195, 'Exhaustividad (Recall)': 0.6112676056338028, 'Puntaje F1': 0.7182457592056268, 'Precisión global (Accuracy)': 0.8108333333333333}
+==================================================
+Sum of weights: 3261.7330
+Mean weight: 0.9060
+Min weight: 0.4579
+Max weight: 1.0000
+==================================================
+Error: 0.1052431656272466
+==================================================
+Peso del modelo: 1.0701392260625435
+==================================================
+Boosting validation
+{'Falsos positivos (FP)': 28, 'Falsos negativos (FN)': 112, 'Verdaderos positivos (TP)': 68, 'Verdaderos negativos (TN)': 192, 'Precisión': 0.7083333333333334, 'Exhaustividad (Recall)': 0.37777777777777777, 'Puntaje F1': 0.49275362318840576, 'Precisión global (Accuracy)': 0.65}
+==================================================
+SVMImageForgeryDetector train
+{'Falsos positivos (FP)': 138, 'Falsos negativos (FN)': 583, 'Verdaderos positivos (TP)': 837, 'Verdaderos negativos (TN)': 2042, 'Precisión': 0.8584615384615385, 'Exhaustividad (Recall)': 0.5894366197183099, 'Puntaje F1': 0.6989561586638832, 'Precisión global (Accuracy)': 0.7997222222222222}
+==================================================
+Sum of weights: 3036.1878
+Mean weight: 0.8434
+Min weight: 0.1570
+Max weight: 1.0000
+==================================================
+Error: 0.052505252274825547
+==================================================
+Peso del modelo: 1.44645409285983
+==================================================
+Boosting validation
+{'Falsos positivos (FP)': 31, 'Falsos negativos (FN)': 111, 'Verdaderos positivos (TP)': 69, 'Verdaderos negativos (TN)': 189, 'Precisión': 0.69, 'Exhaustividad (Recall)': 0.38333333333333336, 'Puntaje F1': 0.49285714285714294, 'Precisión global (Accuracy)': 0.645}
+==================================================
+SVMImageForgeryDetector train
+{'Falsos positivos (FP)': 146, 'Falsos negativos (FN)': 610, 'Verdaderos positivos (TP)': 810, 'Verdaderos negativos (TN)': 2034, 'Precisión': 0.8472803347280334, 'Exhaustividad (Recall)': 0.5704225352112676, 'Puntaje F1': 0.6818181818181819, 'Precisión global (Accuracy)': 0.79}
+==================================================
+Sum of weights: 2914.2990
+Mean weight: 0.8095
+Min weight: 0.0370
+Max weight: 1.0000
+==================================================
+Error: 0.024886616812425346
+==================================================
+Peso del modelo: 1.8341117865600838
+==================================================
+Boosting validation
+{'Falsos positivos (FP)': 31, 'Falsos negativos (FN)': 108, 'Verdaderos positivos (TP)': 72, 'Verdaderos negativos (TN)': 189, 'Precisión': 0.6990291262135923, 'Exhaustividad (Recall)': 0.4, 'Puntaje F1': 0.508833922261484, 'Precisión global (Accuracy)': 0.6525}

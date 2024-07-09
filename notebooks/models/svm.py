@@ -151,7 +151,7 @@ class SVMImageForgeryDetector(BaseEstimator, ClassifierMixin):
         features = [self.preprocess_image(image) for image in images]
         return np.array(features)
 
-    def fit(self, X, y, sample_weight):
+    def fit(self, X, y, sample_weight, X_val=None, y_val=None):
         """
         Fit the SVM model to the preprocessed data.
 
