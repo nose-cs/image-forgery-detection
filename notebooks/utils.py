@@ -64,10 +64,7 @@ def load_images_from_directory(directory_path, n: int, authentic_size, target_si
         if image_path.lower().endswith((".jpg", ".jpeg", ".png")):
             label = 0 if 'authentic' in image_path.lower() else 1
             imagen_original = tf.io.read_file(image_path)
-            imagen_decoded = tf.image.decode_image(imagen_original, channels=3)
-            imagen_resized = tf.image.resize(imagen_decoded, target_size)
-            imagen_encoded = tf.io.encode_jpeg(tf.cast(imagen_resized, tf.uint8))
-            images.append(imagen_encoded)
+            images.append(imagen_original)
             labels.append(label)
         else:
             raise ValueError(f"Unable to process file: {image_path}")

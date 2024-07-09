@@ -127,6 +127,10 @@ class AdaBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
 
         # Find the best model for current weighted samples
         for model in self.base_models:
+            print('=' * 50)
+            print("Pre-train weights:")
+            print_sample_weights(sample_weights=sample_weights)
+
             model.fit(X_train, y_train, sample_weight=sample_weights, X_val=X_val, y_val=y_val)
             predictions = model.predict(X_train).ravel()  # Ensure predictions are 1D
 
@@ -136,8 +140,6 @@ class AdaBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
 
             # Ensure y_train is 1D as well
             y_train = y_train.ravel()
-
-            print_sample_weights(sample_weights=sample_weights)
 
             error = np.sum(sample_weights * (predictions != y_train)) / np.sum(sample_weights)
 
@@ -165,7 +167,7 @@ class AdaBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
             val_pred = self.predict(X_val)
 
             print('=' * 50)
-            print(f"{model.__class__.__name__} train")
+            print(f"{self.__class__.__name__} validation")
             print(get_model_performance_metrics(y_val, val_pred))
 
             val_error = np.mean(val_pred != y_val.ravel())
