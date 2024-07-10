@@ -4,8 +4,6 @@ from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 from sklearn.base import BaseEstimator, ClassifierMixin
 import numpy as np
-from sklearn.model_selection import train_test_split
-import random
 
 
 class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
@@ -110,7 +108,7 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
         X_processed = [self.preprocess_image(image) for image in X]
         return np.array(X_processed)
 
-    def fit(self, X, y, sample_weight=None):
+    def fit(self, X_train, y_train, X_val, y_val, sample_weight=None):
         """
         Fit the model to the training data.
 
@@ -118,12 +116,6 @@ class CNNImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param y: Target labels
         :param sample_weight: Sample weights for training
         """
-        data = list(zip(X, y))
-        random.shuffle(data)
-        X, y = zip(*data)
-
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.1, random_state=42)
-
         X_train = self.prepare_dataset(X_train)
         X_val = self.prepare_dataset(X_val)
         y_train = tf.keras.utils.to_categorical(y_train, num_classes=2)

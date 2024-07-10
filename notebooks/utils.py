@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from prettytable import PrettyTable
 
 
-def display_images(images, labels, classnames, n=9):
+def display_images(images, labels, classnames, n=9, figsize=(5, 5)):
     """
     Displays the first n images and their corresponding labels.
 
@@ -18,11 +18,11 @@ def display_images(images, labels, classnames, n=9):
     n (int): Number of images to display (default is 9).
     """
     n = min(9, n)
-    plt.figure(figsize=(5, 5))
+    plt.figure(figsize=figsize)
     for i in range(n):
         plt.subplot(3, 3, i+1)
         plt.imshow(tf.image.decode_image(images[i], channels=3))
-        plt.title(f"Label: {classnames[labels[i]]}")
+        plt.title(f"{classnames[labels[i]]}")
         plt.axis('off')
     plt.tight_layout()
     plt.show()
@@ -37,7 +37,7 @@ def get_file_list(directory):
     return file_list
 
 
-def load_images_from_directory(directory_path, n: int, authentic_size, target_size=(128, 128), seed=None):
+def load_images_from_directory(directory_path, n: int, authentic_size, seed=None):
     if seed is not None:
         random.seed(seed)
 
@@ -75,10 +75,10 @@ def prepare_image_forgery_dataset(total_number, data_directory, test_size=0.2, r
                                   authentic_size=3/5, img_size=(128, 128)):
     X_train, y_train = load_images_from_directory(os.path.join(data_directory, 'train'),
                                                   int((total_number - total_number*test_size) // 1), seed=random_state,
-                                                  authentic_size=authentic_size, target_size=img_size)
+                                                  authentic_size=authentic_size)
     X_test, y_test = load_images_from_directory(os.path.join(data_directory, 'test'),
                                                 int((total_number*test_size) // 1), seed=random_state,
-                                                authentic_size=authentic_size, target_size=img_size)
+                                                authentic_size=authentic_size)
     y_train = y_train.ravel()
     y_test = y_test.ravel()
     return X_train, X_test, y_train, y_test
