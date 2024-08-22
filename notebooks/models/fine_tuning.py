@@ -47,6 +47,8 @@ class TransferLearningImageForgeryDetector(BaseEstimator, ClassifierMixin):
         :param learning_rate: The initial learning rate for the optimizer
         :type learning_rate: float
         """
+        self.learning_rate = learning_rate
+        self.dropout_rate = dropout_rate
         self.initial_epochs = initial_epochs
         self.fine_tune_epochs = fine_tune_epochs
 
@@ -117,7 +119,7 @@ class TransferLearningImageForgeryDetector(BaseEstimator, ClassifierMixin):
         X_processed = [self.preprocess_image(image) for image in X]
         return np.array(X_processed)
 
-    def fit(self, X, y, sample_weight):
+    def fit(self, X, y, sample_weight, X_val, y_val):
         """
         Fit the model to the training data.
 
@@ -135,7 +137,10 @@ class TransferLearningImageForgeryDetector(BaseEstimator, ClassifierMixin):
         X_processed = self.prepare_dataset(X)
 
         # Initial training
-        history = self.model.fit(X_processed, y, epochs=self.initial_epochs, sample_weight=sample_weight)
+        history = self.model.fit(X_processed, y,
+                                 epochs=self.initial_epochs,
+                                 sample_weight=sample_weight,
+                                 validation_data=(self.prepare_dataset(X_val), y_val))
 
         # Fine-tuning
         self.base_model.trainable = True
@@ -147,15 +152,17 @@ class TransferLearningImageForgeryDetector(BaseEstimator, ClassifierMixin):
 
         self.model.compile(
             loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-            optimizer=tf.keras.optimizers.RMSprop(learning_rate=self.base_learning_rate/10),
+            optimizer=tf.keras.optimizers.RMSprop(learning_rate=self.base_learning_rate),
             metrics=['accuracy']
         )
 
         total_epochs = self.initial_epochs + self.fine_tune_epochs
 
-        self.model.fit(X_processed, y, epochs=total_epochs, initial_epoch=history.epoch[-1])
-
-        return self
+        self.model.fit(X_processed, y,
+                       epochs=total_epochs,
+                       initial_epoch=history.epoch[-1],
+                       sample_weight=sample_weight,
+                       validation_data=(self.prepare_dataset(X_val), y_val))
 
     def predict(self, X):
         """

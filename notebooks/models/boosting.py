@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
 class CustomBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
@@ -44,6 +45,7 @@ class CustomBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
         self.models = []  # List to store selected models
         self.weights = []  # List to store model weights
         self.validation_errors = []  # List to store validation errors
+        self.validation_accurracy = []  # List to store validation accurracy
 
     def print_history(self):
         """
@@ -53,6 +55,10 @@ class CustomBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
         print("Validation Error History:")
         for i, error in enumerate(self.validation_errors, 1):
             print(f"{i}: {error:.4f}")
+        print("="*50)
+        print("Validation Accurracy History:")
+        for i, acc in enumerate(self.validation_accurracy, 1):
+            print(f"{i}: {acc:.4f}")
         print("="*50)
         print("Best Model History:")
         for i, model in enumerate(self.models, 1):
@@ -101,6 +107,8 @@ class CustomBoostingImageForgeryDetector(BaseEstimator, ClassifierMixin):
 
             # Evaluate on validation set
             val_pred = self.predict(X_val)
+            val_acc = accuracy_score(y_val, val_pred)
+            self.validation_accurracy.append(val_acc)
             val_error = np.mean(val_pred != y_val)
             self.validation_errors.append(val_error)
 
